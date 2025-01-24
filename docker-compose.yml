@@ -40,7 +40,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       RABBITMQ_HOST: rabbitmq
     ports:
-      - "8080:8080"
+      - "8075:8075"
     networks:
       - rabbitmq-network
 

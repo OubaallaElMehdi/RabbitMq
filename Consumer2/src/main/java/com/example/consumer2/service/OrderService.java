@@ -2,7 +2,9 @@ package com.example.consumer2.service;
 
 import com.example.consumer2.entity.Order;
 import com.example.consumer2.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,15 +14,21 @@ public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    @Transactional
+    public void saveOrder(Order order) {
+        int maxRetries = 3;
+        int attempt = 0;
 
-    public Order saveOrder(Order order) {
-        if (order.getId() != null && orderRepository.existsById(order.getId())) {
-            Order existingOrder = orderRepository.findById(order.getId()).orElseThrow();
-            existingOrder.setProductName(order.getProductName());
-            existingOrder.setQuantity(order.getQuantity());
-            return orderRepository.save(existingOrder);
-        } else {
-            return orderRepository.save(order);
+        while (attempt < maxRetries) {
+            try {
+                orderRepository.save(order);
+                break; // Exit loop if successful
+            } catch (ObjectOptimisticLockingFailureException e) {
+                attempt++;
+                if (attempt >= maxRetries) {
+                    throw e; // Rethrow exception if max retries are reached
+                }
+            }
         }
     }
 

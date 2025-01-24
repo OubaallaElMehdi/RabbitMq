@@ -15,6 +15,11 @@ public class Order {
 
     private String productName;
     private int quantity;
+
+
+    @Version
+    private Integer version;
+
     @Override
     public String toString() {
         return "Order{" +

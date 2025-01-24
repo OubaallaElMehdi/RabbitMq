@@ -17,6 +17,8 @@ public class Order {
     private int quantity;
 
 
+    @Version
+    private Integer version;
     @Override
     public String toString() {
         return "Order{" +

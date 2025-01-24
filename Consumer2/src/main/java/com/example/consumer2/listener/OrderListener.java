@@ -15,12 +15,11 @@ public class OrderListener {
 
     @RabbitListener(queues = "myQueue")
     public void receiveOrder(Order order) {
-        System.out.println("Received order: " + order);
-        if (order != null) {
-            orderService.saveOrder(order);
-        } else {
-            System.err.println("Received null order!");
+        // Preprocess and validate the order here
+        if (order.getId() != null) {
+            order.setVersion(3); // Initialize version if necessary
         }
+        orderService.saveOrder(order);
     }
     public Order saveOrder(Order order) {
         return orderRepository.save(order);
