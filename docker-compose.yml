@@ -12,18 +12,55 @@ services:
       - "5672:5672"   # Main RabbitMQ port
       - "15672:15672" # Management console
     networks:
-      - rabbitmq-network
+      - app-network
 
-  # MySQL service
-  mysql:
+  # MySQL service for producer
+  mysql-producer:
     image: mysql:8
-    container_name: mysql-db
+    container_name: mysql-producer
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: producer_db
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
-      - rabbitmq-network
+      - app-network
+
+  # MySQL service for consumer1
+  mysql-consumer1:
+    image: mysql:8
+    container_name: mysql-consumer1
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: consumer1_db
+    ports:
+      - "3308:3306"
+    networks:
+      - app-network
+
+  # MySQL service for consumer2
+  mysql-consumer2:
+    image: mysql:8
+    container_name: mysql-consumer2
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: consumer2_db
+    ports:
+      - "3309:3306"
+    networks:
+      - app-network
+
+  # MySQL service for consumer3
+  mysql-consumer3:
+    image: mysql:8
+    container_name: mysql-consumer3
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: consumer3_db
+    ports:
+      - "3310:3306"
+    networks:
+      - app-network
 
   # Producer microservice
   producer:
@@ -33,16 +70,16 @@ services:
     container_name: producer
     depends_on:
       - rabbitmq
-      - mysql
+      - mysql-producer
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/producer_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-producer:3306/producer_db?createDatabaseIfNotExist=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       RABBITMQ_HOST: rabbitmq
     ports:
       - "8075:8075"
     networks:
-      - rabbitmq-network
+      - app-network
 
   # Consumer1 microservice
   consumer1:
@@ -52,9 +89,9 @@ services:
     container_name: consumer1
     depends_on:
       - rabbitmq
-      - mysql
+      - mysql-consumer1
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/consumer1_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-consumer1:3306/consumer1_db?createDatabaseIfNotExist=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       RABBITMQ_HOST: rabbitmq
@@ -62,7 +99,7 @@ services:
     ports:
       - "8091:8091"
     networks:
-      - rabbitmq-network
+      - app-network
 
   # Consumer2 microservice
   consumer2:
@@ -72,9 +109,9 @@ services:
     container_name: consumer2
     depends_on:
       - rabbitmq
-      - mysql
+      - mysql-consumer2
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/consumer2_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-consumer2:3306/consumer2_db?createDatabaseIfNotExist=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       RABBITMQ_HOST: rabbitmq
@@ -82,7 +119,7 @@ services:
     ports:
       - "8092:8092"
     networks:
-      - rabbitmq-network
+      - app-network
 
   # Consumer3 microservice
   consumer3:
@@ -92,9 +129,9 @@ services:
     container_name: consumer3
     depends_on:
       - rabbitmq
-      - mysql
+      - mysql-consumer3
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/consumer3_db?createDatabaseIfNotExist=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-consumer3:3306/consumer3_db?createDatabaseIfNotExist=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       RABBITMQ_HOST: rabbitmq
@@ -102,8 +139,8 @@ services:
     ports:
       - "8093:8093"
     networks:
-      - rabbitmq-network
+      - app-network
 
 networks:
-  rabbitmq-network:
+  app-network:
     driver: bridge

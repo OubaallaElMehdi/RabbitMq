@@ -1,12 +1,9 @@
 package com.example.producer.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "orders")
-@Data
-@AllArgsConstructor
 public class Order {
 
     @Id
@@ -16,14 +13,14 @@ public class Order {
     private String productName;
     private int quantity;
 
-    public Order() {
-    }
+    public Order() {}
 
     public Order(String productName, int quantity) {
         this.productName = productName;
         this.quantity = quantity;
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -46,13 +43,5 @@ public class Order {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-    @Override
-    public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", productName='" + productName + '\'' +
-                ", quantity=" + quantity +
-                '}';
     }
 }

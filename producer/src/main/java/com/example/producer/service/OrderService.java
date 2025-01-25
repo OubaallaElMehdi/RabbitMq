@@ -19,21 +19,12 @@ public class OrderService {
     private RabbitTemplate rabbitTemplate;
 
     public Order saveOrderAndSend(Order order) {
-        // Save in local DB
         Order savedOrder = orderRepository.save(order);
-
-        // Send message to RabbitMQ
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE_NAME,
-                RabbitMQConfig.ROUTING_KEY,
-                savedOrder
-        );
-
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, savedOrder);
         return savedOrder;
     }
+
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
-
-
 }

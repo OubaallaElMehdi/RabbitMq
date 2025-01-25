@@ -16,21 +16,20 @@ public class OrderService {
     private OrderRepository orderRepository;
     @Transactional
     public void saveOrder(Order order) {
-        int maxRetries = 3;
-        int attempt = 0;
+        if (order != null) {
 
-        while (attempt < maxRetries) {
-            try {
-                orderRepository.save(order);
-                break; // Exit loop if successful
-            } catch (ObjectOptimisticLockingFailureException e) {
-                attempt++;
-                if (attempt >= maxRetries) {
-                    throw e; // Rethrow exception if max retries are reached
-                }
-            }
+            Order fOrder = new Order() ;
+            fOrder.setQuantity(order.getQuantity());
+            fOrder.setProductName(order.getProductName());
+            orderRepository.save(fOrder);
+
+
+            System.out.println( "oreder saved "+fOrder );
+
         }
+
     }
+
 
     public List<Order> getAllOrders() {
         return orderRepository.findAll();

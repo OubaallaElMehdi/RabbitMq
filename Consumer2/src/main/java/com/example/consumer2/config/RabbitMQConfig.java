@@ -11,9 +11,17 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE_NAME = "myExchange";
-    public static final String QUEUE_NAME = "myQueue";
+    public static final String QUEUE_NAME = "myQueue2";
     public static final String ROUTING_KEY = "myRoutingKey";
+    @Bean
+    public Queue orderQueue() {
+        return new Queue("order.queue", true);
+    }
 
+    @Bean
+    public Queue myQueue() {
+        return new Queue("myQueue", true);
+    }
     @Bean
     public DirectExchange directExchange() {
         return new DirectExchange(EXCHANGE_NAME);

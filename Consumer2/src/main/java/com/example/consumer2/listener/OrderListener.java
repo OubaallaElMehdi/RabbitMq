@@ -1,11 +1,16 @@
 package com.example.consumer2.listener;
 
 import com.example.consumer2.entity.Order;
-import com.example.consumer2.repository.OrderRepository;
 import com.example.consumer2.service.OrderService;
+import com.rabbitmq.client.Channel;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
 
 @Component
 public class OrderListener {
@@ -15,15 +20,17 @@ public class OrderListener {
 
     @RabbitListener(queues = "myQueue")
     public void receiveOrder(Order order) {
-        // Preprocess and validate the order here
-        if (order.getId() != null) {
-            order.setVersion(3); // Initialize version if necessary
-        }
+        order.setVersion(2); // Initialize version
         orderService.saveOrder(order);
     }
-    public Order saveOrder(Order order) {
-        return orderRepository.save(order);
+    @RabbitListener(queues = "myQueue")
+    public void receiveOrder(Order order, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+        try {
+            orderService.saveOrder(order);
+            channel.basicAck(tag, false); // Acknowledge the message
+        } catch (Exception e) {
+            channel.basicNack(tag, false, true); // Requeue the message
+            throw e; // Re-throw to allow retry
+        }
     }
-    @Autowired
-    private OrderRepository orderRepository;
 }

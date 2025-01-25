@@ -12,18 +12,10 @@ public class OrderListener {
 
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private OrderRepository orderRepository;
+
     @RabbitListener(queues = "myQueue")
     public void receiveOrder(Order order) {
-        System.out.println("Received order: " + order);
-        if (order != null) {
-            orderService.saveOrder(order);
-        } else {
-            System.err.println("Received null order!");
-        }
-    }
-    public Order saveOrder(Order order) {
-        return orderRepository.save(order);
+        order.setVersion(3); // Initialize version
+        orderService.saveOrder(order);
     }
 }
